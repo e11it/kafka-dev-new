@@ -1,0 +1,23 @@
+[
+   {
+        "operations": ["All"],
+        "principal": "ANONYMOUS",
+        "principal_type": "User",
+        "host": "*",
+        "resource": "^(.*)$"
+    },
+    {
+        "operations": ["All"],
+        "principal": "akhq",
+        "principal_type": "User",
+        "host": "*",
+        "resource": "^(.*)$"
+    },
+    {
+        "operations": ["Describe","Write"],
+        "principal": "rest-user",
+        "principal_type": "User",
+        "host": "*",
+        "resource": "dev1s.dev..*"
+    }
+]

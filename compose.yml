@@ -1,0 +1,147 @@
+---
+services:
+  # #############################################################################################
+  kafka:
+    image: e11it/kafka-ext:8.2.0
+    ports:
+      - 9094:9094
+    volumes:
+      - ./kafka/aiven/:/etc/kafka/aiven/:ro
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:8091
+      # Listeners
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9091,CONTROLLER://0.0.0.0:8091,SASL_PLAINTEXT://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9091,CONTROLLER://kafka:8091,SASL_PLAINTEXT://kafka:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,CONTROLLER_SSL:SSL,PLAINTEXT:PLAINTEXT,SSL:SSL,SASL_PLAINTEXT:SASL_PLAINTEXT,SASL_SSL:SASL_SSL
+      # Inter-broker and Controller Security
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      # JAAS Config for the listeners
+      KAFKA_SASL_ENABLED_MECHANISMS: SCRAM-SHA-256,SCRAM-SHA-512
+      KAFKA_LISTENER_NAME_SASL__PLAINTEXT_SCRAM-SHA-256_SASL_JAAS_CONFIG: org.apache.kafka.common.security.scram.ScramLoginModule required users.config="/etc/kafka/aiven/credentials.json";
+      KAFKA_LISTENER_NAME_SASL__PLAINTEXT_SCRAM-SHA-256_SASL_SERVER_CALLBACK_HANDLER_CLASS: io.aiven.kafka.auth.AivenSaslScramServerCallbackHandler
+      KAFKA_LISTENER_NAME_SASL__PLAINTEXT_SCRAM-SHA-512_SASL_JAAS_CONFIG: org.apache.kafka.common.security.scram.ScramLoginModule required users.config="/etc/kafka/aiven/credentials.json";
+      KAFKA_LISTENER_NAME_SASL__PLAINTEXT_SCRAM-SHA-512_SASL_SERVER_CALLBACK_HANDLER_CLASS: io.aiven.kafka.auth.AivenSaslScramServerCallbackHandler
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_NUM_PARTITIONS: 1
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_OPTS: -Dlog4j2.formatMsgNoLookups=true 
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      # Aiven ACL Authorizer
+      KAFKA_AUTHORIZER_CLASS_NAME: io.aiven.kafka.auth.AivenAclAuthorizerV2
+      KAFKA_PRINCIPAL_BUILDER_CLASS: io.strimzi.kafka.oauth.server.OAuthKafkaPrincipalBuilder
+      KAFKA_AIVEN_KAFKA_PRINCIPAL_BUILDER_CONFIGURATION: /etc/kafka/aiven/principal_builder.json
+      KAFKA_AIVEN_ACL_AUTHORIZER_AUDITOR_CLASS_NAME: io.aiven.kafka.auth.audit.UserOperationsActivityAuditor
+      KAFKA_AIVEN_ACL_AUTHORIZER_CACHE_EXPIRE_AFTER_ACCESS_MINUTES: 60
+      KAFKA_AIVEN_ACL_AUTHORIZER_CACHE_MAX_SIZE_PERCENTAGE: 25
+      KAFKA_AIVEN_ACL_AUTHORIZER_CONFIG_REFRESH_INTERVAL: 10
+      KAFKA_AIVEN_ACL_AUTHORIZER_CONFIGURATION: /etc/kafka/aiven/acl.json
+      KAFKA_AIVEN_ACL_AUTHORIZER_LIST_ACLS_ENABLED: True
+      KAFKA_AIVEN_ACL_AUTHORIZER_LOG_DENIALS: True
+      KAFKA_AIVEN_ACL_AUTHORIZER_METRICS_NUM_SAMPLES: 2
+      KAFKA_AIVEN_ACL_AUTHORIZER_METRICS_RECORDING_LEVEL: INFO
+      KAFKA_AIVEN_ACL_AUTHORIZER_METRICS_SAMPLE_WINDOW_MS: 30000
+      KAFKA_AIVEN_ACL_AUTHORIZER_AUDITOR_AGGREGATION_GROUPING: user_and_ip
+      KAFKA_AIVEN_ACL_AUTHORIZER_AUDITOR_AGGREGATION_PERIOD: 10
+      KAFKA_CREATE_TOPIC_POLICY_CLASS_NAME: org.ra.PatternMatchingCreateTopicPolicy
+      KAFKA_RA_TOPIC_PATTERN: "^(dev1s\\.[a-z][a-z0-9-]+[a-z]\\.(doc|ref|cdc|int|log|aud)\\.([a-z][a-z0-9-]+[a-z0-9]\\.)+[a-z0-9-]+|_[a-z0-9-]+)$"
+  # #############################################################################################
+  rest:
+    image: e11it/karapace:6.1.3v2-py14
+    command: python3 -m karapace.kafka_rest_apis
+    ports:
+      - 8082:8082
+    environment:
+      KARAPACE_KARAPACE_REST: true
+      KARAPACE_PORT: 8082
+      KARAPACE_HOST: 0.0.0.0
+      KARAPACE_ADVERTISED_HOSTNAME: rest-proxy
+      KARAPACE_ADVERTISED_PROTOCOL: http
+      #KARAPACE_BOOTSTRAP_URI: erd-s-ipltst03.polyus.com:9093,erd-s-ipltst04.polyus.com:9093,erd-s-ipltst05.polyus.com:9093
+      KARAPACE_SASL_BOOTSTRAP_URI: kafka:9093
+      KARAPACE_SASL_MECHANISM: SCRAM-SHA-256
+      KARAPACE_REGISTRY_USER: "kafka-rest"
+      KARAPACE_REGISTRY_PASSWORD: "kafka_rest_password"
+      # KARAPACE_SECURITY_PROTOCOL: SSL
+      KARAPACE_REGISTRY_SCHEME: http
+      KARAPACE_REGISTRY_HOST: sr
+      KARAPACE_REGISTRY_PORT: 8081
+      KARAPACE_ADMIN_METADATA_MAX_AGE: 0
+      KARAPACE_LOG_LEVEL: INFO
+      # KARAPACE_SSL_CAFILE: /tmp/ca_chain.pem
+      # KARAPACE_SSL_CERTFILE: /tmp/cert.pem
+      # KARAPACE_SSL_KEYFILE: /tmp/key.pem
+      KARAPACE_KAFKA_SCHEMA_READER_STRICT_MODE: True
+      KARAPACE_KAFKA_RETRIABLE_ERRORS_SILENCED: true
+      #
+      KARAPACE_REST_AUTHORIZATION: True
+      KARAPACE_REST_LOOKUP_SCHEMA_BEFORE_REGISTER: True
+      KARAPACE_SUPPRESS_HEALTH_ACCESS_LOGS: True
+  sr:
+    image: e11it/karapace:6.1.3v2-py14
+    ports:
+      - 8081:8081
+    volumes:
+      -  ./sr/aiven:/etc/aiven:ro
+    command: python3 -m karapace
+    environment:
+      KARAPACE_KARAPACE_REGISTRY: true
+      KARAPACE_ADVERTISED_HOSTNAME: localhost
+      KARAPACE_ADVERTISED_PROTOCOL: http
+      KARAPACE_REGISTRY_AUTHFILE: /etc/aiven/authfile.json
+      KARAPACE_BOOTSTRAP_URI: kafka:9091
+      # KARAPACE_SECURITY_PROTOCOL: SSL
+      KARAPACE_PORT: 8081
+      KARAPACE_HOST: 0.0.0.0
+      KARAPACE_CLIENT_ID: schema-registry-0
+      KARAPACE_GROUP_ID: "dev1s-schema-registry"
+      KARAPACE_MASTER_ELECTION_STRATEGY: highest
+      KARAPACE_MASTER_ELIGIBILITY: true
+      KARAPACE_TOPIC_NAME: _schemas_dev1s
+      KARAPACE_LOG_LEVEL: INFO
+      KARAPACE_COMPATIBILITY: FULL
+      KARAPACE_STATSD_HOST: statsd-exporter
+      KARAPACE_STATSD_PORT: 8125
+      KARAPACE_KAFKA_SCHEMA_READER_STRICT_MODE: True
+      KARAPACE_KAFKA_RETRIABLE_ERRORS_SILENCED: true
+      KARAPACE_TAGS__APP: schema-registry
+      # KARAPACE_SERVER_TLS_CAFILE: /tmp/ca_chain.pem
+      # KARAPACE_SERVER_TLS_CERTFILE: /tmp/cert.pem
+      # KARAPACE_SERVER_TLS_KEYFILE: /tmp/key.pem
+      # KARAPACE_SSL_CAFILE: /tmp/ca_chain.pem
+      # KARAPACE_SSL_CERTFILE: /tmp/cert.pem
+      # KARAPACE_SSL_KEYFILE: /tmp/key.pem
+      KARAPACE_SUPPRESS_HEALTH_ACCESS_LOGS: True
+  akhq:
+    image: tchiotludo/akhq:0.26.0
+    container_name: akhq_dev
+    ports:
+      - 8080:8080
+    environment:
+      JAVA_TOOL_OPTIONS: "-Dcom.sun.management.jmxremote=false"
+      AKHQ_CONFIGURATION: |
+        micronaut:
+          server:
+            context-path: "/akhq"
+        akhq:
+          server:
+            access-log: true
+          connections:
+            local:
+              properties:
+              #TODO needs universal solution
+                bootstrap.servers: "kafka:9093"
+                security.protocol: "SASL_PLAINTEXT" # or SASL_PLAINTEXT
+                sasl.mechanism: "SCRAM-SHA-256"
+                sasl.jaas.config: "org.apache.kafka.common.security.scram.ScramLoginModule required username='akhq' password='akhq_password';"
+              schema-registry:
+                url: "http://sr:8081"
+                type: "confluent" # or "tibco"
+                basic-auth-username: "akhq"
+                basic-auth-password: "akhq_password"
+...

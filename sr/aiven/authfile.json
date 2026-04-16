@@ -1,0 +1,33 @@
+{
+	"users": [
+	{
+		"username": "akhq",
+		"algorithm": "sha512",
+		"salt": "dgjkg4ZEy_Em2G8yZLFVRA",
+		"password_hash": "Ml7mM55c/pQfypE4XX/Mu4nAHSqxLaWx/q3pIanoqgb5OpqJ+Eleb31CO/DOmsPzCEOCqzljnxLO98HQORKP/A=="
+	},
+        {
+                "username": "kafka-rest",
+                "algorithm": "sha512",
+                "salt": "vKY8s15rPlXQmjhmvtF9Vw",
+                "password_hash": "Mc6nsMHME9RdDTFrnelQ7V5AiCokBKzl0/Vzb8gt5Y1jqt0pWWtDOUjGHglQ8ATEi5qYyY4qWIuOdg2cX11jYw=="
+        }
+	],
+	"permissions": [
+	{
+		"username": "akhq",
+		"operation": "Write",
+		"resource": ".*"
+	},
+	{
+		"username": "kafka-rest",
+		"operation": "Read",
+		"resource": ".*"
+	},
+	{
+		"username": "kafka-rest",
+		"operation": "Write",
+		"resource": ".*-key"
+	}
+	]
+}
