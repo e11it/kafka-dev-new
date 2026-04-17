@@ -21,7 +21,7 @@
 	},
 	{
 		"username": "kafka-rest",
-		"operation": "Read",
+		"operation": "Write",
 		"resource": ".*"
 	},
 	{

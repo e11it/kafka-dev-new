@@ -18,6 +18,13 @@
         "principal": "rest-user",
         "principal_type": "User",
         "host": "*",
-        "resource": "dev1s.dev..*"
+        "resource": "^dev1s.dev.doc.test-message$"
+    },
+    {
+        "operations": ["Describe"],
+        "principal": "rest-user",
+        "principal_type": "User",
+        "host": "*",
+        "resource": ".*"
     }
 ]

@@ -52,7 +52,7 @@ services:
       KAFKA_RA_TOPIC_PATTERN: "^(dev1s\\.[a-z][a-z0-9-]+[a-z]\\.(doc|ref|cdc|int|log|aud)\\.([a-z][a-z0-9-]+[a-z0-9]\\.)+[a-z0-9-]+|_[a-z0-9-]+)$"
   # #############################################################################################
   rest:
-    image: e11it/karapace:6.1.3v2-py14
+    image: e11it/karapace:6.1.3v3-py14
     command: python3 -m karapace.kafka_rest_apis
     ports:
       - 8082:8082
@@ -82,8 +82,9 @@ services:
       KARAPACE_REST_AUTHORIZATION: True
       KARAPACE_REST_LOOKUP_SCHEMA_BEFORE_REGISTER: True
       KARAPACE_SUPPRESS_HEALTH_ACCESS_LOGS: True
+      KARAPACE_REST_AUTHORIZATION_ENFORCE_TOPIC_WRITE: True
   sr:
-    image: e11it/karapace:6.1.3v2-py14
+    image: e11it/karapace:6.1.3v3-py14
     ports:
       - 8081:8081
     volumes:
