@@ -49,7 +49,7 @@ services:
       KAFKA_AIVEN_ACL_AUTHORIZER_AUDITOR_AGGREGATION_GROUPING: user_and_ip
       KAFKA_AIVEN_ACL_AUTHORIZER_AUDITOR_AGGREGATION_PERIOD: 10
       KAFKA_CREATE_TOPIC_POLICY_CLASS_NAME: org.ra.PatternMatchingCreateTopicPolicy
-      KAFKA_RA_TOPIC_PATTERN: "^(dev1s\\.[a-z][a-z0-9-]+[a-z]\\.(doc|ref|cdc|int|log|aud)\\.([a-z][a-z0-9-]+[a-z0-9]\\.)+[a-z0-9-]+|_[a-z0-9-]+)$"
+      KAFKA_RA_TOPIC_PATTERN: "^(dev1s\\.[a-z][a-z0-9]{1,30}(?:-[a-z0-9]+)*\\.(doc|ref|cdc|int|log|aud|)(?:\\.[a-z][a-z0-9]{1,40}(?:-[a-z0-9]+)*){1,6}(?:\\.v[1-9][0-9]*)?|_{1,2}[a-z][a-z0-9_-]{1,200})$"
   # #############################################################################################
   rest:
     image: e11it/karapace:6.1.3v3-py14
@@ -62,7 +62,6 @@ services:
       KARAPACE_HOST: 0.0.0.0
       KARAPACE_ADVERTISED_HOSTNAME: rest-proxy
       KARAPACE_ADVERTISED_PROTOCOL: http
-      #KARAPACE_BOOTSTRAP_URI: erd-s-ipltst03.polyus.com:9093,erd-s-ipltst04.polyus.com:9093,erd-s-ipltst05.polyus.com:9093
       KARAPACE_SASL_BOOTSTRAP_URI: kafka:9093
       KARAPACE_SASL_MECHANISM: SCRAM-SHA-256
       KARAPACE_REGISTRY_USER: "kafka-rest"
