@@ -1,0 +1,21 @@
+trimurlprefix: /topics/
+proxy:
+  enabled: true
+  proxyhost: http://rest:8082
+# Не писать access-лог (Gin) для перечисленных path (без query); по умолчанию /metrics, OpenAPI, и т.д.
+access_log:
+  exclude_paths: [/metrics, /health, /ready, /api/openapi, /api/openapi/ra.yaml]
+body_validation:
+  enabled: true
+  allowed_operations: [CREATE, UPDATE, UPSERT, DELETE, SNAPSHOT, EVENT]
+  checks: [no_partition, is_tombstone, envelope, payload, entity_key]
+auth:
+  urlvalidreg: ^dev1s\..+?$
+  acl:
+  - path: dev1s\.[a-z0-9-]+\.(doc)\.+?
+    users:
+    - any
+    methods:
+    - post
+    contenttype:
+    - application/vnd.kafka.avro.v2+json

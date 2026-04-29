@@ -1,0 +1,73 @@
+########################
+POST http://localhost:18082/topics/dev1s.ipl-ds-erd.doc.asdfasdf.v2
+Authorization: Basic rest-user:rest_password
+Content-Type: application/vnd.kafka.avro.v2+json
+
+{
+  "key_schema": "{\"type\": \"string\"}",
+  "value_schema": "{\"namespace\": \"example.avro\", \"type\": \"record\", \"name\": \"simple\", \"fields\": [{\"name\": \"name\", \"type\": \"string\"}]}",
+  "records": [{"key": "abc", "value": {"name": "name0"}}]
+}
+
+#####
+GET http://localhost:8081/subjects
+Authorization: Basic akhq:akhq_password
+
+[
+  "dev1s.ipl-ds-erd.doc.asdfasdf.v1-key",
+  "dev1s.ipl-ds-erd.doc.asdfasdf.v1-value"
+]
+
+[
+  "topic.v1-key",
+  "topic.v1-value",
+  "topic.v2-key",
+  "topic.v2-value"
+]
+
+
+#####################
+POST http://localhost:18082/topics/dev1s.ipl-ds-erd.doc.asdfasdf.v2
+Authorization: Basic rest-user:rest_password
+Content-Type: application/vnd.kafka.avro.v2+json
+
+{
+  "key_schema": "{\"type\": \"string\"}",
+  "value_schema": "{\"type\":\"record\",\"name\":\"DocAsdfasdfVer2\",\"namespace\":\"org.example.ipl.ds.erd\",\"fields\":[{\"name\":\"envelope\",\"type\":{\"type\":\"record\",\"name\":\"EventEnvelope\",\"namespace\":\"org.polyus.common.v1\",\"fields\":[{\"name\":\"meta\",\"type\":{\"type\":\"record\",\"name\":\"EventMeta\",\"fields\":[{\"name\":\"eventId\",\"type\":\"string\"},{\"name\":\"entityKey\",\"type\":\"string\"},{\"name\":\"businessKey\",\"type\":[\"null\",\"string\"]},{\"name\":\"operation\",\"type\":\"string\"},{\"name\":\"eventTime\",\"type\":\"long\"},{\"name\":\"eventTimeZone\",\"type\":\"string\"},{\"name\":\"businessDate\",\"type\":[\"null\",\"int\"]}]}},{\"name\":\"tech\",\"type\":{\"type\":\"record\",\"name\":\"EventTech\",\"fields\":[{\"name\":\"sourceSystem\",\"type\":\"string\"},{\"name\":\"schemaVersion\",\"type\":\"string\"},{\"name\":\"producedAt\",\"type\":\"long\"},{\"name\":\"sequence\",\"type\":[\"null\",\"long\"]},{\"name\":\"traceId\",\"type\":[\"null\",\"string\"]}]}}]}},{\"name\":\"payload\",\"type\":[\"null\",{\"type\":\"record\",\"name\":\"Payload\",\"namespace\":\"org.polyus.ipl.ds.erd.doc.asdfasdf.ver1\",\"fields\":[{\"name\":\"amount\",\"type\":\"float\"},{\"name\":\"nameOfPerson\",\"type\":\"string\"}]}],\"default\":null},{\"name\":\"payloadBefore\",\"type\":[\"null\",\"org.polyus.ipl.ds.erd.doc.asdfasdf.ver1.Payload\"],\"default\":null}]}",
+  "records": [
+    {
+      "key": "example-key-10",
+      "value": {
+        "envelope": {
+          "meta": {
+            "businessDate": {
+              "int": 19675
+            },
+            "businessKey": null,
+            "entityKey": "example-key-10",
+            "eventId": "018f1f8b-000a-7000-a000-00000000000a",
+            "eventTime": 1700000000000010,
+            "eventTimeZone": "UTC",
+            "operation": "CREATE"
+          },
+          "tech": {
+            "producedAt": 1700000000000010,
+            "schemaVersion": "1",
+            "sequence": null,
+            "sourceSystem": "ipl-ds-erd",
+            "traceId": null
+          }
+        },
+        "payload": {
+          "Payload": {
+            "amount": 1.5,
+            "nameOfPerson": "example"
+          }},
+        "payloadBefore": {"Payload": {
+            "amount": 1.7,
+            "nameOfPerson": "example2"
+          }}
+      }
+    }
+  ]
+}

@@ -1,5 +1,12 @@
 # KAFKA REST DEV
 
+## Services:
+
+- [AKHQ](http://localhost:8080)
+
+
+##
+
 - Kafka использует SASL авторизацию для сервисов
 - У Schema Registry свои пользователи и ACL
 - AKHQ может делать все в Kafka и Schema Registry
@@ -22,6 +29,9 @@ password: akhq_password
 user: rest-user
 password: rest_password
 
+
+user: rest-user-rw
+password: rest_password
 ## Запись
 
 1. Создать топик `dev1s.dev.doc.test-message` в akhq

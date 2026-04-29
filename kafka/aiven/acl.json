@@ -18,11 +18,25 @@
         "principal": "rest-user",
         "principal_type": "User",
         "host": "*",
-        "resource": "^dev1s.dev.doc.test-message$"
+        "resource": "^Topic:dev1s\\.ipl-ds-erd\\..*$"
+    },
+    {
+        "operations": ["Describe","Write"],
+        "principal": "rest-user-rw",
+        "principal_type": "User",
+        "host": "*",
+        "resource": "^Topic:dev1s\\.ipl-ds-erd\\..*$"
     },
     {
         "operations": ["Describe"],
         "principal": "rest-user",
+        "principal_type": "User",
+        "host": "*",
+        "resource": ".*"
+    },
+    {
+        "operations": ["Describe"],
+        "principal": "rest-user-rw",
         "principal_type": "User",
         "host": "*",
         "resource": ".*"
