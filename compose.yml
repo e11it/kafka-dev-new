@@ -1,4 +1,7 @@
 ---
+x-karapace-image: &karapace-image ghcr.io/aiven-open/karapace:latest
+# *karapace-image
+
 services:
   # # ###########################################################################
   kafka:
@@ -52,7 +55,7 @@ services:
       KAFKA_RA_TOPIC_PATTERN: "^(dev1s\\\\.[a-z][a-z0-9]{1,30}(?:-[a-z0-9]+)*\\\\.(doc|ref|cdc|int|log|aud|)(?:\\\\.[a-z][a-z0-9]{1,40}(?:-[a-z0-9]+)*){1,6}(?:\\\\.v[1-9][0-9]*)?|_{1,2}[a-z][a-z0-9_-]{1,200})$"
   # # ###########################################################################
   rest:
-    image: e11it/karapace:6.1.4v2-py14
+    image: *karapace-image
     # e11it/karapace:6.1.3v4-py14
     command: python3 -m karapace.kafka_rest_apis
     ports:
@@ -87,7 +90,7 @@ services:
       KARAPACE_REST_AUTHORIZATION_ENFORCE_TOPIC_WRITE: True
   # ###########################################################################
   sr:
-    image: e11it/karapace:6.1.4v2-py14
+    image: *karapace-image
     depends_on:
       - kafka-tools
     ports:
@@ -131,6 +134,8 @@ services:
     image: e11it/ra:v3
     restart: unless-stopped
     hostname: ra
+    ports:
+      - 18080:8080
     depends_on:
       - rest
     environment:
@@ -151,10 +156,11 @@ services:
       - KAFKA_CORS_ALLOW_ORIGINS=${KAFKA_CORS_ALLOW_ORIGINS:-*}
       - KAFKA_LOG_HEALTH_SUCCESS=${KAFKA_LOG_HEALTH_SUCCESS:-false}
       - KAFKA_TOPIC_NAME_REGEX=${KAFKA_TOPIC_NAME_REGEX:-^(?<cluster_name>\w{3}\d\w)\.(?<systemPrefix>[a-z][a-z0-9]{1,30}(?:-[a-z0-9]+)*)\.(?<topicType>(doc|ref|cdc|int|log|aud))(?<entityName>(?:\.[a-z][a-z0-9]{1,40}(?:-[a-z0-9]+)*){1,6})(?<entityVersion>\.v[1-9][0-9]*)$}
-      - KAFKA_VALUE_NAMESPACE_PREFIX=${KAFKA_VALUE_NAMESPACE_PREFIX:-org.polyus}
-      - KAFKA_COMMON_NAMESPACE=${KAFKA_COMMON_NAMESPACE:-org.polyus.common}
+      - KAFKA_VALUE_NAMESPACE_PREFIX=${KAFKA_VALUE_NAMESPACE_PREFIX:-com.polyus}
+      - KAFKA_COMMON_NAMESPACE=${KAFKA_COMMON_NAMESPACE:-com.polyus.common}
       - KAFKA_LOG_LEVEL=${KAFKA_LOG_LEVEL:-info}
       - KAFKA_LOG_CHECK_FAILURE_DETAILS=True
+      - KAFKA_LOG_JSON_ENABLED=True
       - KAFKA_VALIDATE_FULL_VALIDATION_TOPIC_TYPES=doc,ref
       - KAFKA_JAVA_COMPILE_ENABLED=${KAFKA_JAVA_COMPILE_ENABLED:-true}
       - KAFKA_JAVA_BIN=${KAFKA_JAVA_BIN:-java}
