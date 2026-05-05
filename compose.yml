@@ -1,5 +1,6 @@
 ---
-x-karapace-image: &karapace-image ghcr.io/aiven-open/karapace:latest
+# x-karapace-image: &karapace-image ghcr.io/aiven-open/karapace:latest
+x-karapace-image: &karapace-image e11it/karapace:6.1.4v2-py14
 # *karapace-image
 
 services:
@@ -86,6 +87,7 @@ services:
       #
       KARAPACE_REST_AUTHORIZATION: True
       KARAPACE_REST_LOOKUP_SCHEMA_BEFORE_REGISTER: True
+      KARAPACE_REST_AVRO_EXTENDED_JSON_PARSER: True
       KARAPACE_SUPPRESS_HEALTH_ACCESS_LOGS: True
       KARAPACE_REST_AUTHORIZATION_ENFORCE_TOPIC_WRITE: True
   # ###########################################################################
